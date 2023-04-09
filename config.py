@@ -3,6 +3,9 @@
 import json
 import logging
 import os
+from bridge.reply import Reply, ReplyType
+import requests
+
 from common.log import logger
 import pickle
 
@@ -18,6 +21,8 @@ available_setting = {
     "use_azure_chatgpt": False,  # 是否使用azure的chatgpt
     "azure_deployment_id": "", #azure 模型部署名称
 
+    "distribute_url": '', # apikey池地址
+    "client_id": "", # 客户端id
     # Bot触发配置
     "single_chat_prefix": ["bot", "@bot"],  # 私聊时文本需要包含该前缀才能触发机器人回复
     "single_chat_reply_prefix": "[bot] ",  # 私聊时自动回复的前缀，用于区分真人
@@ -149,7 +154,6 @@ class Config(dict):
 
 config = Config()
 
-
 def load_config():
     global config
     config_path = "./config.json"
@@ -180,13 +184,36 @@ def load_config():
                 else:
                     config[name] = value
 
+
     if config.get("debug", False):
         logger.setLevel(logging.DEBUG)
-        logger.debug("[INIT] set log level to DEBUG")        
+        logger.debug("[INIT] set log level to DEBUG")
 
     logger.info("[INIT] load config: {}".format(config))
-
     config.load_user_datas()
+
+    # 进行初始化openai
+    if config['open_ai_api_key'] == 'YOUR API KEY':
+        config['open_ai_api_key']=''
+
+    # 初始化key值
+    if not config['open_ai_api_key'] and  config['client_id']:
+        config['open_ai_api_key']=get_remote_api_key(config['distribute_url'],config['client_id'])
+    elif not config['open_ai_api_key']:
+        raise EOFError("未设置clinetId值")
+    print("open_ai_key",config['open_ai_api_key'])
+def get_remote_api_key(distribute_url,clientId):
+    url = distribute_url+"/config/" + clientId
+    s = requests.Session()
+    s.trust_env=False
+    response = s.post(url=url,verify=False)
+    logger.info("response :{}".format(response))
+    response = response.json()
+    if response and response['code']=='10000':
+        reply = Reply(ReplyType.TEXT, response['data'])
+        return reply.content
+    else:
+        raise  Exception("获取apikey出错")
 
 def get_root():
     return os.path.dirname(os.path.abspath(__file__))

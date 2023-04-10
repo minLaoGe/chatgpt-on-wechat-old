@@ -1,0 +1,1 @@
+nohup python restart.py & tail -f nohup.out

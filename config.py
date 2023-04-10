@@ -19,10 +19,12 @@ available_setting = {
     # chatgpt模型， 当use_azure_chatgpt为true时，其名称为Azure上model deployment名称
     "model": "gpt-3.5-turbo",
     "use_azure_chatgpt": False,  # 是否使用azure的chatgpt
-    "azure_deployment_id": "", #azure 模型部署名称
-
-    "distribute_url": '', # apikey池地址
-    "client_id": "", # 客户端id
+    "azure_deployment_id": "",  # azure 模型部署名称
+    "flask_port": 8082,
+    "flask_schema": 0,  # 0默认是http, 1是https
+    "flask_content_path": "config/changeApiKey",
+    "distribute_url": '',  # apikey池地址
+    "client_id": "",  # 客户端id
     # Bot触发配置
     "single_chat_prefix": ["bot", "@bot"],  # 私聊时文本需要包含该前缀才能触发机器人回复
     "single_chat_reply_prefix": "[bot] ",  # 私聊时自动回复的前缀，用于区分真人
@@ -35,11 +37,12 @@ available_setting = {
     "group_chat_in_one_session": ["ChatGPT测试群"],  # 支持会话上下文共享的群名称
     "trigger_by_self": False,  # 是否允许机器人触发
     "image_create_prefix": ["画", "看", "找"],  # 开启图片回复的前缀
-    "concurrency_in_session": 1, # 同一会话最多有多少条消息在处理中，大于1可能乱序
+    "concurrency_in_session": 1,  # 同一会话最多有多少条消息在处理中，大于1可能乱序
 
     # chatgpt会话参数
     "expires_in_seconds": 3600,  # 无操作会话的过期时间
-    "character_desc": "你是ChatGPT, 一个由OpenAI训练的大型语言模型, 你旨在回答并解决人们的任何问题，并且可以使用多种语言与人交流。",  # 人格描述
+    "character_desc": "你是ChatGPT, 一个由OpenAI训练的大型语言模型, 你旨在回答并解决人们的任何问题，并且可以使用多种语言与人交流。",
+    # 人格描述
     "conversation_max_tokens": 1000,  # 支持上下文记忆的最多字符数
 
     # chatgpt限流配置
@@ -51,8 +54,8 @@ available_setting = {
     "top_p": 1,
     "frequency_penalty": 0,
     "presence_penalty": 0,
-    "request_timeout": 60, # chatgpt请求超时时间，openai接口默认设置为600，对于难问题一般需要较长时间
-    "timeout": 120,         # chatgpt重试超时时间，在这个时间内，将会自动重试
+    "request_timeout": 60,  # chatgpt请求超时时间，openai接口默认设置为600，对于难问题一般需要较长时间
+    "timeout": 120,  # chatgpt重试超时时间，在这个时间内，将会自动重试
 
     # 语音设置
     "speech_recognition": False,  # 是否开启语音识别
@@ -85,16 +88,16 @@ available_setting = {
     "wechaty_puppet_service_token": "",  # wechaty的token
 
     # wechatmp的配置
-    "wechatmp_token": "",       # 微信公众平台的Token
-    "wechatmp_port": 8080,      # 微信公众平台的端口,需要端口转发到80或443
-    "wechatmp_app_id": "",      # 微信公众平台的appID，仅服务号需要
+    "wechatmp_token": "",  # 微信公众平台的Token
+    "wechatmp_port": 8080,  # 微信公众平台的端口,需要端口转发到80或443
+    "wechatmp_app_id": "",  # 微信公众平台的appID，仅服务号需要
     "wechatmp_app_secret": "",  # 微信公众平台的appsecret，仅服务号需要
 
     # chatgpt指令自定义触发词
     "clear_memory_commands": ['#清除记忆'],  # 重置会话指令，必须以#开头
 
     # channel配置
-    "channel_type": "wx", # 通道类型，支持：{wx,wxy,terminal,wechatmp,wechatmp_service}
+    "channel_type": "wx",  # 通道类型，支持：{wx,wxy,terminal,wechatmp,wechatmp_service}
 
     "debug": False,  # 是否开启debug模式，开启后会打印更多日志
 
@@ -104,7 +107,7 @@ available_setting = {
 
 
 class Config(dict):
-    def __init__(self, d:dict={}):
+    def __init__(self, d: dict = {}):
         super().__init__(d)
         # user_datas: 用户数据，key为用户名，value为用户数据，也是dict
         self.user_datas = {}
@@ -152,10 +155,24 @@ class Config(dict):
         except Exception as e:
             logger.info("[Config] User datas error: {}".format(e))
 
+
 config = Config()
+
+def load_openai_key():
+    # 进行初始化openai
+    if config['open_ai_api_key'] == 'YOUR API KEY':
+        config['open_ai_api_key'] = ''
+    # 初始化key值
+    if not config['open_ai_api_key'] and config['client_id']:
+        config['open_ai_api_key'] = get_remote_api_key(config['distribute_url'], config['client_id'])
+    elif not config['open_ai_api_key']:
+        raise EOFError("未设置clinetId值")
+    print("open_ai_key", config['open_ai_api_key'])
+    # startup flask
 
 def load_config():
     global config
+
     config_path = "./config.json"
     if not os.path.exists(config_path):
         logger.info('配置文件不存在，将使用config-template.json模板')
@@ -184,7 +201,6 @@ def load_config():
                 else:
                     config[name] = value
 
-
     if config.get("debug", False):
         logger.setLevel(logging.DEBUG)
         logger.debug("[INIT] set log level to DEBUG")
@@ -192,28 +208,35 @@ def load_config():
     logger.info("[INIT] load config: {}".format(config))
     config.load_user_datas()
 
-    # 进行初始化openai
-    if config['open_ai_api_key'] == 'YOUR API KEY':
-        config['open_ai_api_key']=''
 
-    # 初始化key值
-    if not config['open_ai_api_key'] and  config['client_id']:
-        config['open_ai_api_key']=get_remote_api_key(config['distribute_url'],config['client_id'])
-    elif not config['open_ai_api_key']:
-        raise EOFError("未设置clinetId值")
-    print("open_ai_key",config['open_ai_api_key'])
-def get_remote_api_key(distribute_url,clientId):
-    url = distribute_url+"/config/" + clientId
+
+
+load = False
+
+
+def get_remote_api_key(distribute_url, clientId):
+    global load
+    if load:
+        return
+    url = distribute_url + "/config/getApiKey/" + clientId
     s = requests.Session()
-    s.trust_env=False
-    response = s.post(url=url,verify=False)
+    s.trust_env = False
+    payload = {
+        "port": config['flask_port'],
+        "contentPath": config['flask_content_path'],
+        "schema": config['flask_schema']
+    }
+    response = s.post(url=url, json=payload, verify=False)
     logger.info("response :{}".format(response))
     response = response.json()
-    if response and response['code']=='10000':
+    if response and response['code'] == '10000':
         reply = Reply(ReplyType.TEXT, response['data'])
+        print("获取apikey=", reply.content)
+        load = True
         return reply.content
     else:
-        raise  Exception("获取apikey出错")
+        raise Exception("获取apikey出错" + response['data'])
+
 
 def get_root():
     return os.path.dirname(os.path.abspath(__file__))

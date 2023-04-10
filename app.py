@@ -1,7 +1,10 @@
 # encoding:utf-8
+from flask import Flask
+import threading
 
 import os
-from config import conf, load_config
+from listener import changeOpenAiKey
+from config import conf, load_config,load_openai_key
 from channel import channel_factory
 from common.log import logger
 from plugins import *
@@ -21,6 +24,8 @@ def run():
     try:
         # load config
         load_config()
+
+
         # ctrl + c
         sigterm_handler_wrap(signal.SIGINT)
         # kill signal
@@ -39,12 +44,20 @@ def run():
         channel = channel_factory.create_channel(channel_name)
         if channel_name in ['wx','wxy','terminal','wechatmp','wechatmp_service']:
             PluginManager().load_plugins()
-
+        load_openai_key()
+        # 创建一个新线程，并指定 worker 函数作为它的目标
+        new_thread = threading.Thread(target=start_flask)
+        # 启动新线程
+        new_thread.start()
         # startup channel
         channel.startup()
     except Exception as e:
         logger.error("App startup failed!")
         logger.exception(e)
-
+def start_flask():
+    app = Flask(__name__)
+    app.register_blueprint(changeOpenAiKey.blueprint)
+    port = conf().get('flask_port', '8082')
+    app.run(host="127.0.0.1", port=port, debug=False)
 if __name__ == '__main__':
     run()

@@ -80,8 +80,7 @@ class ChatGPTBot(Bot, OpenAIImage):
             #     return self.reply_text_stream(query, new_query, session_id)
 
             reply_content = self.reply_text(session, api_key)
-            if api_key != reply_content['openKey']:
-                context.__setitem__("openai_api_key",reply_content['openKey'])
+
             logger.debug(
                 "[CHATGPT] new_query={}, session_id={}, reply_cont={}, completion_tokens={}".format(
                     session.messages,

@@ -5,6 +5,7 @@ import time
 import openai
 import openai.error
 
+import config
 from bot.bot import Bot
 from bot.chatgpt.chat_gpt_session import ChatGPTSession
 from bot.openai.open_ai_image import OpenAIImage
@@ -72,13 +73,15 @@ class ChatGPTBot(Bot, OpenAIImage):
             session = self.sessions.session_query(query, session_id)
             logger.debug("[CHATGPT] session query={}".format(session.messages))
 
-            api_key = context.get("openai_api_key")
+            api_key = config.config['open_ai_api_key']
 
             # if context.get('stream'):
             #     # reply in stream
             #     return self.reply_text_stream(query, new_query, session_id)
 
             reply_content = self.reply_text(session, api_key)
+            if api_key != reply_content['openKey']:
+                context.__setitem__("openai_api_key",reply_content['openKey'])
             logger.debug(
                 "[CHATGPT] new_query={}, session_id={}, reply_cont={}, completion_tokens={}".format(
                     session.messages,
@@ -152,6 +155,22 @@ class ChatGPTBot(Bot, OpenAIImage):
                 logger.warn("[CHATGPT] APIConnectionError: {}".format(e))
                 need_retry = False
                 result["content"] = "我连接不到你的网络"
+            elif isinstance(e, openai.error.AuthenticationError):
+                logger.error("[OPEN_AI] AuthenticationError重新获取openkey: {}".format(e))
+                from config import load_openai_key,config,get_remote_api_key,modifyLoad,setOpenAiKey
+                modifyLoad()
+                config['open_ai_api_key'] = get_remote_api_key(config['distribute_url'], config['client_id'],
+                                                           config['open_ai_api_key'])
+
+                api_key = config['open_ai_api_key']
+                setOpenAiKey(api_key)
+                if retry_count > 3:
+                 need_retry=False
+                 logger.error("获取openAIkey值异常")
+                else:
+                 need_retry = True
+                result[2]= '重新获取openkey'
+
             else:
                 logger.warn("[CHATGPT] Exception: {}".format(e))
                 need_retry = False

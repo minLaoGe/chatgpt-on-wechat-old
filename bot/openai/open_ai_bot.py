@@ -124,6 +124,18 @@ class OpenAIBot(Bot, OpenAIImage):
                 logger.warn("[OPEN_AI] APIConnectionError: {}".format(e))
                 need_retry = False
                 result["content"] = "我连接不到你的网络"
+            elif isinstance(e, openai.error.AuthenticationError):
+                logger.error("[OPEN_AI] AuthenticationError重新获取openkey: {}".format(e))
+                if retry_count > 3:
+                 need_retry=False
+                else:
+                    from config import get_remote_api_key,config,modifyLoad,setOpenAiKey
+                    modifyLoad()
+                    config['open_ai_api_key'] = get_remote_api_key(config['distribute_url'], config['client_id'],config['open_ai_api_key'])
+                    need_retry= True
+                    setOpenAiKey(config['open_ai_api_key'])
+
+                result[2]= '重新获取openkey'
             else:
                 logger.warn("[OPEN_AI] Exception: {}".format(e))
                 need_retry = False

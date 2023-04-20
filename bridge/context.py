@@ -43,6 +43,13 @@ class Context:
         except KeyError:
             return default
 
+    def set_item(self,key,value):
+        if key == "type":
+            self.type = value
+        elif key == "content":
+            self.content = value
+        else:
+            self.kwargs[key] = value
     def __setitem__(self, key, value):
         if key == "type":
             self.type = value

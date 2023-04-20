@@ -165,7 +165,9 @@ def load_openai_key():
         raise EOFError("未设置clinetId值")
     print("open_ai_key", config['open_ai_api_key'])
     # startup flask
-
+def setOpenAiKey(newKey):
+    global config
+    config['open_ai_api_key'] = newKey
 def load_config():
     global config
     config_path = "./config.json"
@@ -209,9 +211,11 @@ def load_config():
 
 
 load = False
+def modifyLoad():
+    global load
+    load = False
 
-
-def get_remote_api_key(distribute_url, clientId):
+def get_remote_api_key(distribute_url, clientId,originOpenAiKey=''):
     global load
     if load:
         return
@@ -221,17 +225,19 @@ def get_remote_api_key(distribute_url, clientId):
     payload = {
         "port": config['flask_port'],
         "contentPath": config['flask_content_path'],
-        "schema": config['flask_schema']
+        "schema": config['flask_schema'],
+        "oriOpenKey": originOpenAiKey
     }
     response = s.post(url=url, json=payload, verify=False)
     logger.info("response :{}".format(response))
     response = response.json()
     if response and response['code'] == '10000':
         reply = Reply(ReplyType.TEXT, response['data'])
-        print("获取apikey=", reply.content)
+        logger.info("获取apikey=", reply.content)
         load = True
         return reply.content
     else:
+        logger.error('获取apikey出错{}'.format(response))
         raise Exception("获取apikey出错" + response['data'])
 
 

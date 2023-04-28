@@ -170,10 +170,11 @@ def setOpenAiKey(newKey):
     config['open_ai_api_key'] = newKey
 def load_config():
     global config
-    config_path = "./config.json"
+    config_dir = os.path.dirname(os.path.abspath(__file__))
+    config_path = os.path.join(config_dir, "config.json")
     if not os.path.exists(config_path):
         logger.info("配置文件不存在，将使用config-template.json模板")
-        config_path = "./config-template.json"
+        config_path = os.path.join(config_dir, "config-template.jso")
 
     config_str = read_file(config_path)
     logger.debug("[INIT] config str: {}".format(config_str))

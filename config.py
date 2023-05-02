@@ -63,6 +63,7 @@ available_setting = {
     "always_reply_voice": False,  # 是否一直使用语音回复
     "voice_to_text": "openai",  # 语音识别引擎，支持openai,google,azure
     "text_to_voice": "baidu",  # 语音合成引擎，支持baidu,google,pytts(offline),azure
+    "flask_name": "",
 
     # baidu 语音api配置， 使用百度语音识别和语音合成时需要
     "baidu_app_id": "",

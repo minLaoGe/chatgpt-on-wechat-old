@@ -5,6 +5,7 @@
   "distribute_url": "http://170.106.193.82/distribute",
   "flask_port": 8082,
   "flask_content_path": "config/changeApiKey",
+  "flask_name": "hello",
   "flask_schema": 0,
   "proxy": "",
   "single_chat_prefix": [

@@ -174,7 +174,7 @@ def load_config():
     config_path = os.path.join(config_dir, "config.json")
     if not os.path.exists(config_path):
         logger.info("配置文件不存在，将使用config-template.json模板")
-        config_path = os.path.join(config_dir, "config-template.jso")
+        config_path = os.path.join(config_dir, "config-template.json")
 
     config_str = read_file(config_path)
     logger.debug("[INIT] config str: {}".format(config_str))

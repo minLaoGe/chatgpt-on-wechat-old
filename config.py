@@ -224,9 +224,20 @@ def get_remote_api_key(distribute_url, clientId,originOpenAiKey=''):
     url = distribute_url + "/config/getApiKey/" + clientId
     s = requests.Session()
     s.trust_env = False
+
+    if os.getenv('FLASK_PORT'):
+        port= os.getenv('FLASK_PORT')
+    else:
+        port = conf().get('flask_port', '8082')
+
+    if os.getenv("FLASK_PATH"):
+        content_path = os.getenv("FLASK_PATH")
+    else:
+        content_path = conf().get('flask_content_path', __name__)
+
     payload = {
-        "port": config['flask_port'],
-        "contentPath": config['flask_content_path'],
+        "port": port,
+        "contentPath": content_path,
         "schema": config['flask_schema'],
         "oriOpenKey": originOpenAiKey
     }

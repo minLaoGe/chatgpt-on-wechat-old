@@ -59,8 +59,15 @@ def run():
         logger.error("App startup failed!")
         logger.exception(e)
 def start_flask():
-    port = conf().get('flask_port', '8082')
-    name = conf().get('flask_name', __name__)
+    if os.getenv('FLASK_PORT'):
+        port= os.getenv('FLASK_PORT')
+    else:
+        port = conf().get('flask_port', '8082')
+
+    if os.getenv("FLASK_NAME"):
+        name = os.getenv("FLASK_NAME")
+    else:
+        name = conf().get('flask_name', __name__)
     app = Flask(name)
     app.register_blueprint(changeOpenAiKey.blueprint)
 

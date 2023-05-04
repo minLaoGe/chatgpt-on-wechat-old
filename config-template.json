@@ -27,6 +27,7 @@
     "看",
     "找"
   ],
+  "welcome": "",
   "speech_recognition": false,
   "group_speech_recognition": false,
   "voice_reply_voice": false,

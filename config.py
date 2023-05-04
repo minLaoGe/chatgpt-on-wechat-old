@@ -94,7 +94,7 @@ available_setting = {
 
     # chatgpt指令自定义触发词
     "clear_memory_commands": ['#清除记忆'],  # 重置会话指令，必须以#开头
-
+    "welcome": "",
     # channel配置
     "channel_type": "wx",  # 通道类型，支持：{wx,wxy,terminal,wechatmp,wechatmp_service}
     "debug": False,  # 是否开启debug模式，开启后会打印更多日志

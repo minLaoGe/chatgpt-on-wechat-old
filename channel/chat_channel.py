@@ -181,13 +181,7 @@ class ChatChannel(Channel):
             )
         )
         reply = e_context["reply"]
-        logger.debug(
-            "[WX]  type={}, welcome={}".format(
-                context.type, conf().get("welcome")
-            )
-        )
-        if context.type == ContextType.JOIN_GROUP and conf().get("welcome"):
-            return conf().get("welcome")
+
 
         if not e_context.is_pass():
             logger.debug(

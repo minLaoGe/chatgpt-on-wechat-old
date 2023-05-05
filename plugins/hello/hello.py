@@ -6,7 +6,7 @@ from bridge.reply import Reply, ReplyType
 from channel.chat_message import ChatMessage
 from common.log import logger
 from plugins import *
-
+from config import conf
 
 @plugins.register(
     name="Hello",
@@ -31,6 +31,21 @@ class Hello(Plugin):
             return
 
         if e_context["context"].type == ContextType.JOIN_GROUP:
+            welcome= conf().get("welcome");
+            logger.debug(
+                "[WX]  welcome={}".format(
+                    welcome
+                )
+            )
+            if welcome:
+                reply = Reply()
+                reply.type = ReplyType.TEXT
+                reply.content = welcome
+                e_context["reply"] = reply
+                e_context.action = EventAction.BREAK_PASS  # 事件结束，进入默认处理逻辑，一般会覆写reply
+                return
+
+
             e_context["context"].type = ContextType.TEXT
             msg: ChatMessage = e_context["context"]["msg"]
             e_context[

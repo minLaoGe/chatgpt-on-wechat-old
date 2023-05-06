@@ -5,7 +5,6 @@ import time
 import openai
 import openai.error
 
-import config
 from bot.bot import Bot
 from bot.chatgpt.chat_gpt_session import ChatGPTSession
 from bot.openai.open_ai_image import OpenAIImage
@@ -73,7 +72,7 @@ class ChatGPTBot(Bot, OpenAIImage):
             session = self.sessions.session_query(query, session_id)
             logger.debug("[CHATGPT] session query={}".format(session.messages))
 
-            api_key = config.config['open_ai_api_key']
+            api_key = conf().get('open_ai_api_key')
 
             # if context.get('stream'):
             #     # reply in stream
@@ -138,11 +137,15 @@ class ChatGPTBot(Bot, OpenAIImage):
                 "content": response.choices[0]["message"]["content"],
             }
         except Exception as e:
+            logger.error("出错了:",e)
             need_retry = retry_count < 2
             result = {"completion_tokens": 0, "content": "我现在有点累了，等会再来吧"}
             if isinstance(e, openai.error.RateLimitError):
                 logger.warn("[CHATGPT] RateLimitError: {}".format(e))
+                logger.error("[CHATGPT] 提问太快说明key繁忙，需要重新获取key: {}".format(e))
+                api_key = self.getNewKey(api_key)
                 result["content"] = "提问太快啦，请休息一下再问我吧"
+                need_retry= True;
                 if need_retry:
                     time.sleep(20)
             elif isinstance(e, openai.error.Timeout):
@@ -156,13 +159,7 @@ class ChatGPTBot(Bot, OpenAIImage):
                 result["content"] = "我连接不到你的网络"
             elif isinstance(e, openai.error.AuthenticationError):
                 logger.error("[OPEN_AI] AuthenticationError重新获取openkey: {}".format(e))
-                from config import load_openai_key,config,get_remote_api_key,modifyLoad,setOpenAiKey
-                modifyLoad()
-                config['open_ai_api_key'] = get_remote_api_key(config['distribute_url'], config['client_id'],
-                                                           config['open_ai_api_key'])
-
-                api_key = config['open_ai_api_key']
-                setOpenAiKey(api_key)
+                api_key = self.getNewKey(api_key)
                 if retry_count > 3:
                  need_retry=False
                  logger.error("获取openAIkey值异常")
@@ -180,6 +177,16 @@ class ChatGPTBot(Bot, OpenAIImage):
                 return self.reply_text(session, api_key, retry_count + 1)
             else:
                 return result
+
+    def getNewKey(self, api_key):
+        from config import load_openai_key, config, get_remote_api_key, modifyLoad, setOpenAiKey
+        modifyLoad()
+        new_key = get_remote_api_key(config['distribute_url'], config['client_id'],
+                                     config['open_ai_api_key'])
+        conf().set('open_ai_api_key', new_key)
+        api_key = conf().get('open_ai_api_key')
+        setOpenAiKey(api_key)
+        return api_key
 
 
 class AzureChatGPTBot(ChatGPTBot):

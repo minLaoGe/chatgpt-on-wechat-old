@@ -128,6 +128,12 @@ class Config(dict):
         except Exception as e:
             raise e
 
+
+    def set(self,key,value):
+        logger.info(f"修改key:{key},修改成: {value}")
+        return super().__setitem__(key, value)
+
+
     # Make sure to return a dictionary to ensure atomic
     def get_user_data(self, user) -> dict:
         if self.user_datas.get(user) is None:
@@ -159,16 +165,19 @@ def load_openai_key():
     # 进行初始化openai
     if config['open_ai_api_key'] == 'YOUR API KEY':
         config['open_ai_api_key'] = ''
-    # 初始化key值
+    # 如何没有配置opena_ai_api_key 和client_id
     if not config['open_ai_api_key'] and config['client_id']:
-        config['open_ai_api_key'] = get_remote_api_key(config['distribute_url'], config['client_id'])
+        new_key = get_remote_api_key(config['distribute_url'], config['client_id'])
+        config.set('open_ai_api_key',new_key)
+        logger.info("初始化程序去获取open_ai_key", config['open_ai_api_key'])
     elif not config['open_ai_api_key']:
         raise EOFError("未设置clinetId值")
     print("open_ai_key", config['open_ai_api_key'])
     # startup flask
 def setOpenAiKey(newKey):
     global config
-    config['open_ai_api_key'] = newKey
+    config.set("open_ai_api_key",newKey)
+
 def load_config():
     global config
     config_dir = os.path.dirname(os.path.abspath(__file__))
@@ -251,6 +260,8 @@ def get_remote_api_key(distribute_url, clientId,originOpenAiKey=''):
         return reply.content
     else:
         logger.error('获取apikey出错{}'.format(response))
+        # reply = Reply(ReplyType.TEXT, "请联系管理人员内部服务器错误")
+        # return reply.content
         raise Exception("获取apikey出错" + response['data'])
 
 

@@ -12,6 +12,7 @@
     "bot",
     "@bot"
   ],
+  "debug" : true,
   "single_chat_reply_prefix": "[bot] ",
   "group_chat_prefix": [
     "@bot"

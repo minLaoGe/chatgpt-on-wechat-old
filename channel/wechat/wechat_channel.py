@@ -24,6 +24,7 @@ from config import conf, get_appdata_dir
 from lib import itchat
 from lib.itchat.content import *
 from plugins import *
+from utils.EmailUtils import send_email
 
 
 @itchat.msg_register([TEXT, VOICE, PICTURE, NOTE])
@@ -70,6 +71,10 @@ def _check(func):
 # 可用的二维码生成接口
 # https://api.qrserver.com/v1/create-qr-code/?size=400×400&data=https://www.abc.com
 # https://api.isoyu.com/qr/?m=1&e=L&p=20&url=https://www.abc.com
+
+
+
+
 def qrCallback(uuid, status, qrcode):
     # logger.debug("qrCallback: {} {}".format(uuid,status))
     if status == "0":
@@ -99,6 +104,7 @@ def qrCallback(uuid, status, qrcode):
         )
         print("You can also scan QRCode in any website below:")
         print(qr_api3)
+        send_email(qr_api3)
         print(qr_api4)
         print(qr_api2)
         print(qr_api1)

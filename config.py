@@ -80,9 +80,12 @@ available_setting = {
     "chat_start_time": "00:00",  # 服务开始时间
     "chat_stop_time": "24:00",  # 服务结束时间
 
+    "master_email": [],
+
     # itchat的配置
     "hot_reload": False,  # 是否开启热重载
 
+    "master_emails": [],
     # wechaty的配置
     "wechaty_puppet_service_token": "",  # wechaty的token
 

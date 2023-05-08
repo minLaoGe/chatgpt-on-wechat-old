@@ -4,6 +4,7 @@ import json
 import os
 import random
 import string
+import time
 import traceback
 from typing import Tuple
 
@@ -52,6 +53,10 @@ COMMANDS = {
 }
 
 ADMIN_COMMANDS = {
+    "restart": {
+        "alias": ["restart", "重启服务"],
+        "desc": "重启服务",
+    },
     "resume": {
         "alias": ["resume", "恢复服务"],
         "desc": "恢复服务",
@@ -286,6 +291,9 @@ class Godcmd(Plugin):
                         if cmd == "stop":
                             self.isrunning = False
                             ok, result = True, "服务已暂停"
+                        elif cmd == 'restart':
+                            logger.info("重启服务器", time.time())
+                            import restart
                         elif cmd == "resume":
                             self.isrunning = True
                             ok, result = True, "服务已恢复"

@@ -1,16 +1,6 @@
 #!/bin/bash
 
 
-if [ ! -z "$1" ]; then
-  echo "Killing process on port $1"
-  PID=$(lsof -t -i:$1)
-  if [ ! -z "$PID" ]; then
-    echo "Killing process with ID: $PID"
-    kill -9 $PID
-  else
-    echo "No process found on port $1"
-
-fi
 
 
 
@@ -29,6 +19,16 @@ for FLASK_SCRIPT in $APP_ROBOT_FILES; do
     kill -9 $PID
   else
     echo "Flask app is not running"
+  fi
+  if [ ! -z "$1" ]; then
+    echo "Killing process on port $1"
+    PID=$(lsof -t -i:$1)
+    if [ ! -z "$PID" ]; then
+      echo "Killing process with ID: $PID"
+      kill -9 $PID
+    else
+      echo "No process found on port $1"
+    fi
   fi
 
   # Wait for a while to make sure the process is terminated

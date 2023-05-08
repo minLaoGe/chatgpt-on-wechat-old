@@ -9,8 +9,7 @@ if [ ! -z "$1" ]; then
     kill -9 $PID
   else
     echo "No process found on port $1"
-  fi
-  exit 0
+
 fi
 
 

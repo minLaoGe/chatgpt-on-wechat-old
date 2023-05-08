@@ -1,47 +1,51 @@
 import smtplib
 from email.mime.text import MIMEText
-from email.header import Header
+from email.utils import formataddr
+from common.log import logger
 from config import conf
 
 # 邮件服务器地址
 smtp_server = 'smtp.qq.com'
 # 发件人邮箱地址
-from_addr = '2950596701@qq.com'
+my_sender = '2950596701@qq.com'
 # 发件人邮箱密码或授权码
-password = 'tykjmnprjvvsddaa'
+my_pass = 'tykjmnprjvvsddaa'
 
 
 
-def send_email(qr_api3):
-
-    master_emails = conf().get("master_emails",[])
-
-    last_emails = []
-    if len(master_emails)<=0:
-        return
-
-
-    for email in master_emails:
-        last_emails.append(email.strip())
-
-
-
-    # 邮件内容
-    message = MIMEText(f'尊敬的用户，最新登录地址为: \n\n\t{qr_api3}', 'plain', 'utf-8')
-    message['From'] = Header('流云工作室', 'utf-8')
-    message['To'] = Header('尊敬的客户', 'utf-8')
-    message['Subject'] = Header('重新登录提醒', 'utf-8')
-
-    # 发送邮件
+# 第三方 SMTP 服务
+def send_email(addr):
+    ret = True
     try:
-        server = smtplib.SMTP(smtp_server, 25)
-        server.starttls()
-        server.login(from_addr, password)
-        server.sendmail(from_addr, last_emails, message.as_string())
-        print('邮件发送成功')
-    except Exception as e:
-        print('邮件发送失败')
-    finally:
-        server.quit()
+
+        #需要修改
 
 
+        cc_list  = conf().get("master_emails",[])
+        if len(cc_list) <=0:
+            logger.info("没有配置邮箱地址，无需发送邮箱")
+            return
+
+
+        my_user= cc_list[0]
+
+
+        msg = MIMEText(f'尊敬的客户，重新登录二维码地址在下，请点击扫码登录: \n\n\t {addr}', 'plain', 'utf-8')
+
+        msg['Subject'] = "请重新登录" # 邮件的主题，也可以说是标题
+        msg['Cc'] = ','.join(cc_list)
+        msg['From'] = formataddr(["流云工作室", my_sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
+
+
+        msg['To'] = formataddr(["尊敬的客户", my_user])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
+        server = smtplib.SMTP_SSL("smtp.qq.com", 465)  # 发件人邮箱中的SMTP服务器，端口是25
+        server.login(my_sender, my_pass)  # 括号中对应的是发件人邮箱账号、邮箱密码
+        server.sendmail(my_sender, [my_user, ], msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
+        server.quit()  # 关闭连接
+        logger.info("发送成功")
+    except Exception as e:  # 如果 try 中的语句没有执行，则会执行下面的 ret=False
+        logger.error("Main program error:")
+        logger.error(e)
+
+        ret = False
+    return ret

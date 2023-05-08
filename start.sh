@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+
+
+
 # Find Python files with names starting with 'app_robot'
 APP_ROBOT_FILES=$(find . -name "app_robot*.py")
 
@@ -11,13 +15,14 @@ for FLASK_SCRIPT in $APP_ROBOT_FILES; do
   # If the process ID is not empty, kill the process
   if [ ! -z "$PID" ]; then
     echo "Killing the Flask app with process ID: $PID"
+    echo "Killing the Flask appname is: $FLASK_SCRIPT"
     kill -9 $PID
   else
     echo "Flask app is not running"
   fi
 
   # Wait for a while to make sure the process is terminated
-  sleep 2
+  sleep 29
 
   # Start the Flask application
   echo "Starting the Flask app"

@@ -61,6 +61,8 @@ async def login(self, enableCmdQR=False, picDir=None, qrCallback=None, EventScan
             await asyncio.sleep(0.1)
             # logger.info('Please scan the QR code to log in.')
         isLoggedIn = False
+
+        # 这里登录逻辑
         while not isLoggedIn:
             status = await self.check_login()
             # if hasattr(qrCallback, '__call__'):

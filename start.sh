@@ -1,6 +1,17 @@
 #!/bin/bash
 
 
+if [ ! -z "$1" ]; then
+  echo "Killing process on port $1"
+  PID=$(lsof -t -i:$1)
+  if [ ! -z "$PID" ]; then
+    echo "Killing process with ID: $PID"
+    kill -9 $PID
+  else
+    echo "No process found on port $1"
+  fi
+  exit 0
+fi
 
 
 
@@ -9,15 +20,13 @@ APP_ROBOT_FILES=$(find . -name "app_robot*.py")
 
 # Iterate through the found files
 for FLASK_SCRIPT in $APP_ROBOT_FILES; do
-  FILENAME=$(basename $FLASK_SCRIPT)
-
   # Find the process ID of the Flask application
-  PID=$(pgrep -f $FILENAME)
+  PID=$(pgrep -f $FLASK_SCRIPT)
 
   # If the process ID is not empty, kill the process
   if [ ! -z "$PID" ]; then
     echo "Killing the Flask app with process ID: $PID"
-    echo "Killing the Flask appname is: $FILENAME"
+    echo "Killing the Flask appname is: $FLASK_SCRIPT"
     kill -9 $PID
   else
     echo "Flask app is not running"

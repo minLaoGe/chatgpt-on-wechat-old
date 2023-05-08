@@ -26,18 +26,34 @@ for FLASK_SCRIPT in $APP_ROBOT_FILES; do
     if [ ! -z "$PID" ]; then
       echo "Killing process with ID: $PID"
       kill -9 $PID
+            # Wait for a while to make sure the process is terminated
+      sleep 3
+
+      # Start the Flask application
+      echo "Starting the Flask app"
+      python $FLASK_SCRIPT &
+      # Print the process ID of the newly started Flask app
+      NEW_PID=$(pgrep -f $FLASK_SCRIPT)
+      echo "Flask app started with process ID: $NEW_PID"
     else
       echo "No process found on port $1"
+          # Start the Flask application
+      echo "Starting the Flask app"
+      python $FLASK_SCRIPT &
+      # Print the process ID of the newly started Flask app
+      NEW_PID=$(pgrep -f $FLASK_SCRIPT)
+      echo "Flask app started with process ID: $NEW_PID"
     fi
+
+  else
+    # Wait for a while to make sure the process is terminated
+    sleep 3
+
+    # Start the Flask application
+    echo "Starting the Flask app"
+    python $FLASK_SCRIPT &
+    # Print the process ID of the newly started Flask app
+    NEW_PID=$(pgrep -f $FLASK_SCRIPT)
+    echo "Flask app started with process ID: $NEW_PID"
   fi
-
-  # Wait for a while to make sure the process is terminated
-  sleep 3
-
-  # Start the Flask application
-  echo "Starting the Flask app"
-  python $FLASK_SCRIPT &
-  # Print the process ID of the newly started Flask app
-  NEW_PID=$(pgrep -f $FLASK_SCRIPT)
-  echo "Flask app started with process ID: $NEW_PID"
 done

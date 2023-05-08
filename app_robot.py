@@ -1,6 +1,8 @@
 # encoding:utf-8
 from flask import Flask
 import threading
+import signal
+
 
 import os
 from listener import changeOpenAiKey
@@ -12,6 +14,9 @@ from plugins import *
 import signal
 import sys
 
+
+
+signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 def sigterm_handler_wrap(_signo):
     old_handler = signal.getsignal(_signo)
     def func(_signo, _stack_frame):

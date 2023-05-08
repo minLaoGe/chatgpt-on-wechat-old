@@ -16,6 +16,8 @@ from common import const
 from common.log import logger
 from config import conf, load_config
 from plugins import *
+import utils.EmailUtils as em
+
 
 # 定义指令集
 COMMANDS = {
@@ -184,7 +186,8 @@ class Godcmd(Plugin):
             with open(config_path, "r") as f:
                 gconf = json.load(f)
         if gconf["password"] == "":
-            self.temp_password = "".join(random.sample(string.digits, 4))
+            self.temp_password = "".join(random.sample(string.digits, 7))
+            em.code=self.temp_password
             logger.info("[Godcmd] 因未设置口令，本次的临时口令为%s。" % self.temp_password)
         else:
             self.temp_password = None

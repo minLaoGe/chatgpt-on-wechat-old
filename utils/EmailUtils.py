@@ -1,4 +1,5 @@
 import smtplib
+import time
 from email.mime.text import MIMEText
 from email.utils import formataddr
 from common.log import logger
@@ -11,12 +12,17 @@ my_sender = '2950596701@qq.com'
 # 发件人邮箱密码或授权码
 my_pass = 'tykjmnprjvvsddaa'
 
-
+code = ''
 
 # 第三方 SMTP 服务
 def send_email(addr):
     ret = True
+
     try:
+        if not code:
+            time.sleep(2)
+
+
 
         #需要修改
 
@@ -28,10 +34,7 @@ def send_email(addr):
 
 
         my_user= cc_list[0]
-
-
-        msg = MIMEText(f'尊敬的客户，重新登录二维码地址在下，请点击扫码登录: \n\n\t {addr}', 'plain', 'utf-8')
-
+        msg = MIMEText(f'尊敬的客户，重新登录二维码地址在下，请点击扫码登录,口令为 {code}: \n\n\t {addr}', 'plain', 'utf-8')
         msg['Subject'] = "请重新登录" # 邮件的主题，也可以说是标题
         msg['Cc'] = ','.join(cc_list)
         msg['From'] = formataddr(["流云工作室", my_sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号

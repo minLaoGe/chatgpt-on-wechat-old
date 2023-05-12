@@ -115,6 +115,30 @@ def qrCallback(uuid, status, qrcode):
         qr.print_ascii(invert=True)
 
 
+
+
+
+def begin_heartbeat():
+    i = 0
+    status_path = os.path.join(get_appdata_dir(), "itchat.pkl")
+    try:
+        while True:
+            logger.info("个人信息.....心跳检测",);
+            logger.info(itchat.search_friends())
+            time.sleep(10)  # Wait for 30 seconds
+    except Exception as e:
+        logger.error(e)
+        try:
+            itchat.auto_login(
+                enableCmdQR=2,
+                hotReload=False,
+                statusStorageDir=status_path,
+                qrCallback=qrCallback,
+            )
+            begin_heartbeat()
+        except Exception as e:
+            logger.error(e)
+
 @singleton
 class WechatChannel(ChatChannel):
     NOT_SUPPORT_REPLYTYPE = []
@@ -129,13 +153,16 @@ class WechatChannel(ChatChannel):
         hotReload = conf().get("hot_reload", False)
         status_path = os.path.join(get_appdata_dir(), "itchat.pkl")
         try:
+
             itchat.auto_login(
                 enableCmdQR=2,
                 hotReload=hotReload,
                 statusStorageDir=status_path,
                 qrCallback=qrCallback,
             )
+
         except Exception as e:
+            logger.error("登录异常",e)
             if hotReload:
                 logger.error("Hot reload failed, try to login without hot reload")
                 itchat.logout()
@@ -152,6 +179,8 @@ class WechatChannel(ChatChannel):
                 self.user_id, self.name
             )
         )
+        t = threading.Thread(target=begin_heartbeat)
+        t.start()
         # start message listener
         itchat.run()
 

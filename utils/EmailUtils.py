@@ -22,7 +22,7 @@ my_pass = conf().get("mail_password","tykjmnprjvvsddaa")
 code = ''
 
 # 第三方 SMTP 服务
-def send_email(addr):
+def send_email(addr,othercodeadd):
     ret = True
 
     try:
@@ -72,7 +72,7 @@ def send_email(addr):
         for file in files:
             botname=os.path.basename(file).replace('app_robot', '').replace(".py",'')
 
-        text_part  = MIMEText(f'尊敬的客户机器人昵称为:{botname}，需要重新登录二维码地址在下，请点击扫码登录,口令为 {code}: \n\n\t {addr} \n\n 或者扫描一下二维码 <br><img src="cid:image1">', 'html', 'utf-8')
+        text_part  = MIMEText(f'尊敬的客户机器人昵称为:{botname}，需要重新登录二维码地址在下，请点击扫码登录,口令为 {code}: \n\n\t {othercodeadd} \n\n 或者扫描一下二维码 <br><img src="cid:image1">', 'html', 'utf-8')
         msg.attach(text_part)
         msg.attach(msg_image)
 

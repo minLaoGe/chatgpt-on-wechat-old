@@ -104,7 +104,7 @@ def qrCallback(uuid, status, qrcode):
         )
         print("You can also scan QRCode in any website below:")
         print(qr_api3)
-        send_email(qr_api3)
+        send_email(url)
         print(qr_api4)
         print(qr_api2)
         print(qr_api1)

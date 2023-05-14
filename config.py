@@ -48,7 +48,8 @@ available_setting = {
     # chatgpt限流配置
     "rate_limit_chatgpt": 20,  # chatgpt的调用频率限制
     "rate_limit_dalle": 50,  # openai dalle的调用频率限制
-
+    "mail_sender":  '2950596701@qq.com',
+    "mail_password":  'tykjmnprjvvsddaa',
     # chatgpt api参数 参考https://platform.openai.com/docs/api-reference/chat/create
     "temperature": 0.9,
     "top_p": 1,

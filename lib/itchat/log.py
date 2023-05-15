@@ -1,4 +1,6 @@
 import logging
+from logging.handlers import TimedRotatingFileHandler
+
 
 class LogSystem(object):
     handlerList = []
@@ -34,3 +36,20 @@ class LogSystem(object):
 
 ls = LogSystem()
 set_logging = ls.set_logging
+# 创建一个 logger
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)  # 设置日志级别为 DEBUG
+
+# 创建一个 handler，用于写入日志文件，并在每天午夜，创建新的日志文件
+fh = TimedRotatingFileHandler('logfile.log', when='midnight', interval=1, backupCount=7)
+fh.setLevel(logging.DEBUG)  # 设置 handler 的日志级别为 DEBUG
+
+# 定义 handler 的输出格式
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+
+# 给 logger 添加 handler
+logger.addHandler(fh)
+
+# 使用 logger
+logger.debug('This is a debug message')

@@ -131,7 +131,7 @@ def begin_heartbeat():
         try:
             itchat.auto_login(
                 enableCmdQR=2,
-                hotReload=False,
+                hotReload=True,
                 statusStorageDir=status_path,
                 qrCallback=qrCallback,
             )

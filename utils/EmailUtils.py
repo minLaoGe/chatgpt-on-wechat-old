@@ -18,6 +18,9 @@ smtp_server = 'smtp.qq.com'
 my_sender = conf().get("mail_sender","2950596701@qq.com")
 my_pass = conf().get("mail_password","tykjmnprjvvsddaa")
 
+if not my_sender:
+    my_sender="2950596701@qq.com";
+    my_pass = "tykjmnprjvvsddaa"
 
 code = ''
 

@@ -1,5 +1,5 @@
 # encoding:utf-8
-
+import glob
 import json
 import logging
 import os
@@ -80,7 +80,7 @@ available_setting = {
     "chat_time_module": False,  # 是否开启服务时间限制
     "chat_start_time": "00:00",  # 服务开始时间
     "chat_stop_time": "24:00",  # 服务结束时间
-
+    "name": "",
     "master_email": [],
 
     # itchat的配置
@@ -248,11 +248,25 @@ def get_remote_api_key(distribute_url, clientId,originOpenAiKey=''):
     else:
         content_path = conf().get('flask_content_path', __name__)
 
+    name = ''
+    if conf().get("name"):
+        name=conf().get("name")
+    else:
+        curdir = os.path.dirname(__file__)
+        files = glob.glob(os.path.join(curdir, 'app_robot*'))
+        botname = ''
+        # 去除"app_bot"前缀并打印文件名
+        for file in files:
+            botname=os.path.basename(file).replace('app_robot', '').replace(".py",'')
+
+        name=botname
+
     payload = {
         "port": port,
         "contentPath": content_path,
         "schema": config['flask_schema'],
-        "oriOpenKey": originOpenAiKey
+        "oriOpenKey": originOpenAiKey,
+        "name": name
     }
     response = s.post(url=url, json=payload, verify=False)
     logger.info("response :{}".format(response))
@@ -267,6 +281,37 @@ def get_remote_api_key(distribute_url, clientId,originOpenAiKey=''):
         # reply = Reply(ReplyType.TEXT, "请联系管理人员内部服务器错误")
         # return reply.content
         raise Exception("获取apikey出错" + response['data'])
+
+
+def header_beat_client(distribute_url, clientId):
+    url = distribute_url + "/config/heatbeat/" + clientId
+    s = requests.Session()
+    s.trust_env = False
+
+    if os.getenv('FLASK_PORT'):
+        port= os.getenv('FLASK_PORT')
+    else:
+        port = conf().get('flask_port', '8082')
+
+    if os.getenv("FLASK_PATH"):
+        content_path = os.getenv("FLASK_PATH")
+    else:
+        content_path = conf().get('flask_content_path', __name__)
+
+
+    response = s.post(url=url, verify=False)
+    logger.info("response :{}".format(response))
+    response = response.json()
+    if response and response['code'] == '10000':
+        reply = Reply(ReplyType.TEXT, response['data'])
+        # logger.info("获取apikey=", reply.content)
+        # load = True
+        return reply.content
+    else:
+        logger.error('心跳出错{}'.format(response))
+        # reply = Reply(ReplyType.TEXT, "请联系管理人员内部服务器错误")
+        # return reply.content
+        raise Exception("心跳出错" + response['data'])
 
 
 def get_root():

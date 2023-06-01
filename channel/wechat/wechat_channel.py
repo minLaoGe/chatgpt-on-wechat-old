@@ -20,7 +20,7 @@ from common.expired_dict import ExpiredDict
 from common.log import logger
 from common.singleton import singleton
 from common.time_check import time_checker
-from config import conf, get_appdata_dir
+from config import conf, get_appdata_dir, header_beat_client
 from lib import itchat
 from lib.itchat.content import *
 from plugins import *
@@ -124,18 +124,20 @@ def begin_heartbeat():
     try:
         while True:
             logger.info("个人信息.....心跳检测",);
+            clientId = conf().get("client_id");
+            distribute_url = conf().get("distribute_url");
             logger.info(itchat.search_friends())
-            time.sleep(10)  # Wait for 30 seconds
+            try:
+                header_beat_client(distribute_url,clientId)
+            except Exception as e:
+                logger.error(e)
+
+            # logger.info(itchat.search_friends())
+            time.sleep(100)  # Wait for 30 seconds
     except Exception as e:
         logger.error(e)
         try:
-            itchat.auto_login(
-                enableCmdQR=2,
-                hotReload=True,
-                statusStorageDir=status_path,
-                qrCallback=qrCallback,
-            )
-            begin_heartbeat()
+            import restart
         except Exception as e:
             logger.error(e)
 

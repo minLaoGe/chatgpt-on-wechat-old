@@ -1,11 +1,11 @@
 {
   "open_ai_api_key": "YOUR API KEY",
   "model": "gpt-3.5-turbo",
-  "client_id": "83475kj",
+  "client_id": "",
   "distribute_url": "http://170.106.193.82/distribute",
-  "flask_port": 8082,
+  "flask_port": 0,
   "flask_content_path": "config/changeApiKey",
-  "flask_name": "hello",
+  "flask_name": "",
   "flask_schema": 0,
   "proxy": "",
   "single_chat_prefix": [

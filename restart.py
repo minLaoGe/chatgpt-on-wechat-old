@@ -17,4 +17,3 @@ def script_to_run():
 non_daemon_thread = threading.Thread(target=script_to_run, daemon=False)
 
 non_daemon_thread.start()
-print("Main thread continues...")

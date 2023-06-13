@@ -339,11 +339,14 @@ async def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
                     self.alive = False
                 else:
                     time.sleep(1)
+
+        logger.info("测试logout1")
         self.logout()
         if hasattr(exitCallback, '__call__'):
             exitCallback(self.storageClass.userName)
         else:
             logger.info('LOG OUT!')
+            import restart
     if getReceivingFnOnly:
         return maintain_loop
     else:

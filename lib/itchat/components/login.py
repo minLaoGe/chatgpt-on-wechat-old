@@ -320,10 +320,12 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
                     self.alive = False
                 else:
                     time.sleep(1)
+        logger.info("测试logout4")
         self.logout()
         if hasattr(exitCallback, '__call__'):
             exitCallback()
         else:
+            import restart
             logger.info('LOG OUT!')
     if getReceivingFnOnly:
         return maintain_loop

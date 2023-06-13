@@ -60,6 +60,7 @@ def load_login_status(self, fileDir,
     except:
         msgList = contactList = None
     if (msgList or contactList) is None:
+        logger.info("测试logout3")
         self.logout()
         load_last_login_status(self.s, j['cookies'])
         logger.debug('server refused, loading login status failed.')

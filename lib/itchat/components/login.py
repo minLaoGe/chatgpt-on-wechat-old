@@ -321,6 +321,7 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
                 else:
                     time.sleep(1)
         logger.info("测试logout4")
+        logger.info("退出了重启")
         import restart
         self.logout()
         if hasattr(exitCallback, '__call__'):

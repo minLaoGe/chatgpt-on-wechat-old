@@ -313,16 +313,18 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
                 retryCount = 0
             except requests.exceptions.ReadTimeout:
                 pass
-            except:
+            except Exception:
                 retryCount += 1
                 logger.error(traceback.format_exc())
                 if self.receivingRetryCount < retryCount:
-                    self.alive = False
+                    # self.alive = False，让他一直循环，不退出
+                    logger.info("退出了重启,等三秒试试")
                 else:
                     time.sleep(1)
         logger.info("测试logout4")
-        logger.info("退出了重启")
         import restart
+        logger.info("退出了重启,等三秒试试")
+        time.sleep(3)
         self.logout()
         if hasattr(exitCallback, '__call__'):
             exitCallback()

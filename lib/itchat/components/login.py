@@ -290,6 +290,7 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
             try:
                 i = sync_check(self)
                 if i is None:
+                    import restart
                     self.alive = False
                 elif i == '0':
                     pass

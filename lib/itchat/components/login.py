@@ -285,7 +285,8 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
 
     def maintain_loop():
         retryCount = 0
-        while self.alive:
+        # while self.alive:
+        while True:
             try:
                 i = sync_check(self)
                 if i is None:
@@ -311,10 +312,10 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
                         self.msgList.put(chatroomMsg)
                         update_local_friends(self, otherList)
                 retryCount = 0
-            except requests.exceptions.ReadTimeout:
-                pass
-            except Exception:
-                pass
+            except requests.exceptions.ReadTimeout as e:
+                logger.error("捕捉到错误",e)
+            except Exception as e:
+                logger.error("捕捉到错误",e)
                 # retryCount += 1
                 # logger.error(traceback.format_exc())
                 # if self.receivingRetryCount < retryCount:

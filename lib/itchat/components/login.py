@@ -314,13 +314,14 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
             except requests.exceptions.ReadTimeout:
                 pass
             except Exception:
-                retryCount += 1
-                logger.error(traceback.format_exc())
-                if self.receivingRetryCount < retryCount:
-                    # self.alive = False，让他一直循环，不退出
-                    logger.info("退出了重启,等三秒试试")
-                else:
-                    time.sleep(1)
+                pass
+                # retryCount += 1
+                # logger.error(traceback.format_exc())
+                # if self.receivingRetryCount < retryCount:
+                #     # self.alive = False，让他一直循环，不退出
+                #     logger.info("退出了重启,等三秒试试")
+                # else:
+                #     time.sleep(1)
         logger.info("测试logout4")
         import restart
         logger.info("退出了重启,等三秒试试")

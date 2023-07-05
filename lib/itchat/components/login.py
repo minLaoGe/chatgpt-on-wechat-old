@@ -291,7 +291,13 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
                 i = sync_check(self)
                 if i is None:
                     import restart
-                    self.alive = False
+                    if hasattr(exitCallback, '__call__'):
+                        logger.error("出现异常了")
+                        exitCallback()
+                    else:
+                        logger.error('LOG OUT!')
+                        return;
+                    # self.alive = False
                 elif i == '0':
                     pass
                 else:
@@ -314,15 +320,15 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
                         update_local_friends(self, otherList)
                 retryCount = 0
             except requests.exceptions.ReadTimeout as e:
-                logger.info("捕捉到错误",e)
+                logger.info("捕捉到超时错误",e)
             except Exception as e:
                 logger.info("捕捉到错误",e)
                 retryCount += 1
                 logger.error(traceback.format_exc())
                 if self.receivingRetryCount < retryCount:
                     # self.alive = False，让他一直循环，不退出
+                    logger.info("异常超过三次了,重启了")
                     import  restart
-                    logger.info("退出了重启,等三秒试试")
                 else:
                     time.sleep(1)
         logger.info("测试logout4")

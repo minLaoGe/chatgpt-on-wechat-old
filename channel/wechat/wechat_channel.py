@@ -123,17 +123,18 @@ def begin_heartbeat():
     status_path = os.path.join(get_appdata_dir(), "itchat.pkl")
     try:
         while True:
-            logger.info("个人信息.....心跳检测",);
+            logger.info("心跳检测",);
             clientId = conf().get("client_id");
             distribute_url = conf().get("distribute_url");
-            logger.info(itchat.search_friends())
+            frinth = itchat.search_friends()
+            logger.info(frinth)
             try:
                 header_beat_client(distribute_url,clientId)
             except Exception as e:
                 logger.error(e)
 
             # logger.info(itchat.search_friends())
-            time.sleep(100)  # Wait for 30 seconds
+            time.sleep(180)  # Wait for 3 分钟
     except Exception as e:
         logger.error(e)
         try:
@@ -181,7 +182,7 @@ class WechatChannel(ChatChannel):
                 self.user_id, self.name
             )
         )
-        t = threading.Thread(target=begin_heartbeat)
+        t = threading.Thread(target=begin_heartbeat,daemon= True)
         t.start()
         # start message listener
         itchat.run()

@@ -132,7 +132,8 @@ def begin_heartbeat():
                 i=i+1
                 if i >3:
                     logger.error("获取朋友列表错误超过三次,进行重启")
-                    import restart
+                    return
+                    # import restart
             else:
                 i=0
             try:

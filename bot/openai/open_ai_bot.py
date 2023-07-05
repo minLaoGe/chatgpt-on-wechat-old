@@ -110,6 +110,7 @@ class OpenAIBot(Bot, OpenAIImage):
         except Exception as e:
             need_retry = retry_count < 2
             result = {"completion_tokens": 0, "content": "我现在有点累了，等会再来吧"}
+            logger.error("出现错误了:",e);
             if isinstance(e, openai.error.RateLimitError):
                 logger.warn("[OPEN_AI] RateLimitError: {}".format(e))
                 result["content"] = "提问太快啦，请休息一下再问我吧"

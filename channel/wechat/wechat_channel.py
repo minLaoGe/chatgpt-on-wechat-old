@@ -120,7 +120,6 @@ def qrCallback(uuid, status, qrcode):
 
 def begin_heartbeat():
     i = 0
-    status_path = os.path.join(get_appdata_dir(), "itchat.pkl")
     try:
         while True:
             logger.info("心跳检测",);
@@ -128,6 +127,14 @@ def begin_heartbeat():
             distribute_url = conf().get("distribute_url");
             frinth = itchat.search_friends()
             logger.info(frinth)
+            if not frinth:
+                logger.error("获取朋友列表错误")
+                i=i+1
+                if i >3:
+                    logger.error("获取朋友列表错误超过三次,进行重启")
+                    import restart
+            else:
+                i=0
             try:
                 header_beat_client(distribute_url,clientId)
             except Exception as e:

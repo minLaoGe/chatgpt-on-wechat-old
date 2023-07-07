@@ -296,6 +296,9 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
                         exitCallback()
                     else:
                         logger.error('LOG OUT!')
+                        logger.error('begin to sleep')
+                        time.sleep(1000)
+                        logger.error(' sleep over')
                         return;
                     # self.alive = False
                 elif i == '0':

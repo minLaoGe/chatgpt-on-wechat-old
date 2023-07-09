@@ -4,7 +4,7 @@ import time
 
 import openai
 import openai.error
-
+import requests
 from bot.bot import Bot
 from bot.chatgpt.chat_gpt_session import ChatGPTSession
 from bot.openai.open_ai_image import OpenAIImage
@@ -14,7 +14,7 @@ from bridge.reply import Reply, ReplyType
 from common.log import logger
 from common.token_bucket import TokenBucket
 from config import conf, load_config
-
+import json
 
 # OpenAI对话模型API (可用)
 class ChatGPTBot(Bot, OpenAIImage):
@@ -127,15 +127,37 @@ class ChatGPTBot(Bot, OpenAIImage):
             if conf().get("rate_limit_chatgpt") and not self.tb4chatgpt.get_token():
                 raise openai.error.RateLimitError("RateLimitError: rate limit exceeded")
             # if api_key == None, the default openai.api_key will be used
-            response = openai.ChatCompletion.create(
-                api_key=api_key, messages=session.messages, **self.args
-            )
-            # logger.info("[ChatGPT] reply={}, total_tokens={}".format(response.choices[0]['message']['content'], response["usage"]["total_tokens"]))
-            return {
+            if conf().get("distribute_url") and not conf().get("open_ai_api_key"):
+                clientId =conf().get("client_id")
+                data=self.args
+                data['messages']=session.messages
+                headers = {
+                    'Content-Type': 'application/json',
+                    'client-id': clientId,
+                    'people-desuka': 'robots'
+                    # 如果还有其他的headers，你可以在这里添加
+                }
+                # 发送POST请求
+                distributeUrl= conf().get("distribute_url") +'/openAI/v1/chat/completions';
+
+                response = requests.post(distributeUrl, headers=headers, data=json.dumps(data))
+                res = json.loads(response.text)
+                response=res['data']
+                return {
                 "total_tokens": response["usage"]["total_tokens"],
                 "completion_tokens": response["usage"]["completion_tokens"],
-                "content": response.choices[0]["message"]["content"],
-            }
+                "content": response['choices'][0]["message"]["content"],
+                }
+            else:
+                response = openai.ChatCompletion.create(
+                    api_key=api_key, messages=session.messages, **self.args
+                )
+            # logger.info("[ChatGPT] reply={}, total_tokens={}".format(response.choices[0]['message']['content'], response["usage"]["total_tokens"]))
+                return {
+                    "total_tokens": response["usage"]["total_tokens"],
+                    "completion_tokens": response["usage"]["completion_tokens"],
+                    "content": response.choices[0]["message"]["content"],
+                }
         except Exception as e:
             logger.error("出错了:",e)
             need_retry = retry_count < 2
@@ -143,7 +165,7 @@ class ChatGPTBot(Bot, OpenAIImage):
             if isinstance(e, openai.error.RateLimitError):
                 logger.warn("[CHATGPT] RateLimitError: {}".format(e))
                 logger.error("[CHATGPT] 提问太快说明key繁忙，需要重新获取key: {}".format(e))
-                api_key = self.getNewKey(api_key)
+                # api_key = self.getNewKey(api_key)
                 result["content"] = "提问太快啦，请休息一下再问我吧"
                 need_retry= True;
                 if need_retry:
@@ -159,7 +181,7 @@ class ChatGPTBot(Bot, OpenAIImage):
                 result["content"] = "我连接不到你的网络"
             elif isinstance(e, openai.error.AuthenticationError):
                 logger.error("[OPEN_AI] AuthenticationError重新获取openkey: {}".format(e))
-                api_key = self.getNewKey(api_key)
+                # api_key = self.getNewKey(api_key)
                 if retry_count > 3:
                  need_retry=False
                  logger.error("获取openAIkey值异常")

@@ -298,8 +298,13 @@ def header_beat_client(distribute_url, clientId):
     else:
         content_path = conf().get('flask_content_path', __name__)
 
-
-    response = s.post(url=url, verify=False)
+    headers = {
+        'Content-Type': 'application/json',
+        'client-id': clientId,
+        'people-desuka': 'robots'
+        # 如果还有其他的headers，你可以在这里添加
+    }
+    response = s.post(url=url,headers=headers ,verify=False)
     logger.info("response :{}".format(response))
     response = response.json()
     if response and response['code'] == '10000':

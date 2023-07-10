@@ -124,10 +124,11 @@ class ChatGPTBot(Bot, OpenAIImage):
         :return: {}
         """
         try:
+            isOpenAI = conf().get("is_openAI");
             if conf().get("rate_limit_chatgpt") and not self.tb4chatgpt.get_token():
                 raise openai.error.RateLimitError("RateLimitError: rate limit exceeded")
             # if api_key == None, the default openai.api_key will be used
-            if conf().get("distribute_url") and not conf().get("open_ai_api_key"):
+            if conf().get("distribute_url") and not isOpenAI:
                 clientId =conf().get("client_id")
                 data=self.args
                 data['messages']=session.messages

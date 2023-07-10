@@ -21,6 +21,7 @@ available_setting = {
     "use_azure_chatgpt": False,  # 是否使用azure的chatgpt
     "azure_deployment_id": "",  # azure 模型部署名称
     "flask_port": 8082,
+    "is_openAI": False,
     "flask_schema": 0,  # 0默认是http, 1是https
     "flask_content_path": "config/changeApiKey",
     "distribute_url": '',  # apikey池地址

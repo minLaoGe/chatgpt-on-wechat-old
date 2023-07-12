@@ -164,7 +164,7 @@ class ChatGPTBot(Bot, OpenAIImage):
                     "content": response.choices[0]["message"]["content"],
                 }
         except Exception as e:
-            logger.error("出错了:",e)
+            logger.info("出错了:",e)
             need_retry = retry_count < 2
             result = {"completion_tokens": 0, "content": "我现在有点累了，等会再来吧"}
             if isinstance(e, openai.error.RateLimitError):

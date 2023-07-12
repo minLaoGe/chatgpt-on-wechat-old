@@ -123,7 +123,10 @@ class ChatGPTBot(Bot, OpenAIImage):
         :param retry_count: retry count
         :return: {}
         """
+
         try:
+            start_time = time.time()  # 获取当前时间
+
             isOpenAI = conf().get("is_openAI");
             if conf().get("rate_limit_chatgpt") and not self.tb4chatgpt.get_token():
                 raise openai.error.RateLimitError("RateLimitError: rate limit exceeded")
@@ -138,10 +141,11 @@ class ChatGPTBot(Bot, OpenAIImage):
                     'people-desuka': 'robots'
                     # 如果还有其他的headers，你可以在这里添加
                 }
+                logger.info("开始请求ChatGPT了")
                 # 发送POST请求
                 distributeUrl= conf().get("distribute_url") +'/openAI/v1/chat/completions';
 
-                response = requests.post(distributeUrl, headers=headers, data=json.dumps(data))
+                response = requests.post(distributeUrl, headers=headers, data=json.dumps(data),timeout=600)
                 res = json.loads(response.text)
                 response=res['data']
                 return {
@@ -200,6 +204,12 @@ class ChatGPTBot(Bot, OpenAIImage):
                 return self.reply_text(session, api_key, retry_count + 1)
             else:
                 return result
+
+        finally:
+            end_time = time.time()  # 获取当前时间
+            elapsed_time = end_time - start_time  # 计算执行时间
+            # 不论异常是否发生，这里的代码都将被执行
+            logger.info(f"Execution time: {elapsed_time} seconds")
 
     def getNewKey(self, api_key):
         from config import load_openai_key, config, get_remote_api_key, modifyLoad, setOpenAiKey

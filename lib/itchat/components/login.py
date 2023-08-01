@@ -302,8 +302,8 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
                         return;
                     # self.alive = False
                 elif i == '0':
-                    logger.error('不知道咋回事，建议在看看呢')
-                    logger.error('begin to sleep')
+                    logger.debug('正常运行中')
+                    logger.debug('begin to sleep')
                     pass
                 else:
                     msgList, contactList = self.get_msg()

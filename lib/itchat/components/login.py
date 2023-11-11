@@ -293,13 +293,12 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
                     import restart
                     if hasattr(exitCallback, '__call__'):
                         logger.error("出现异常了")
-                        exitCallback()
+                        raise ValueError("可能出错了")
                     else:
                         logger.error('LOG OUT!')
                         logger.error('begin to sleep')
-                        time.sleep(1000)
                         logger.error(' sleep over')
-                        return;
+                        raise ValueError("可能出错了")
                     # self.alive = False
                 elif i == '0':
                     logger.debug('正常运行中')
@@ -330,17 +329,20 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
                 logger.info("捕捉到错误",e)
                 retryCount += 1
                 logger.error(traceback.format_exc())
+                logger.info(f"""啊啊啊啊，错误了${self.receivingRetryCount},${retryCount}""")
+
                 if self.receivingRetryCount < retryCount:
                     # self.alive = False，让他一直循环，不退出
-                    logger.info("异常超过三次了,重启了")
-                    import  restart
+                    # raise ValueError("退出了")
+                    # import  restart
+                    time.sleep(3600)
                 else:
                     time.sleep(1)
         logger.info("测试logout4")
         import restart
         logger.info("退出了重启,等三秒试试")
         time.sleep(3)
-        self.logout()
+        # self.logout()
         if hasattr(exitCallback, '__call__'):
             exitCallback()
         else:

@@ -133,7 +133,7 @@ def begin_heartbeat():
             distribute_url = conf().get("distribute_url");
             frinth = itchat.search_friends()
             logger.info(frinth)
-            if not frinth:
+            if not frinth or 'NewConnectionError' in frinth:
                 logger.error("获取朋友列表错误")
                 i=i+1
                 if i >3:

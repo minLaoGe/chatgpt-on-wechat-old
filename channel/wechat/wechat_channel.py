@@ -152,7 +152,8 @@ def begin_heartbeat():
     except Exception as e:
         logger.error(e)
         try:
-            import restart
+            # import restart
+            logger.info("退出了")
         except Exception as e:
             logger.error(e)
 

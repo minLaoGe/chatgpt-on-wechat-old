@@ -290,7 +290,7 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
             try:
                 i = sync_check(self)
                 if i is None:
-                    import restart
+                    # import restart
                     if hasattr(exitCallback, '__call__'):
                         logger.error("出现异常了")
                         raise ValueError("可能出错了")
@@ -339,7 +339,7 @@ def start_receiving(self, exitCallback=None, getReceivingFnOnly=False):
                 else:
                     time.sleep(1)
         logger.info("测试logout4")
-        import restart
+        # import restart
         logger.info("退出了重启,等三秒试试")
         time.sleep(3)
         # self.logout()

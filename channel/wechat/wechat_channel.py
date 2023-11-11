@@ -117,7 +117,13 @@ def qrCallback(uuid, status, qrcode):
 
 
 
+def after_logout():
+        # 你的登出后处理逻辑
+    print("已登出!")
 
+def after_login():
+        # 你的登录后处理逻辑
+    print("已登录!")
 def begin_heartbeat():
     i = 0
     try:
@@ -158,6 +164,7 @@ class WechatChannel(ChatChannel):
         super().__init__()
         self.receivedMsgs = ExpiredDict(60 * 60 * 24)
 
+
     def startup(self):
         itchat.instance.receivingRetryCount = 600  # 修改断线超时时间
         # login by scan QRCode
@@ -193,7 +200,12 @@ class WechatChannel(ChatChannel):
         t = threading.Thread(target=begin_heartbeat,daemon= True)
         t.start()
         # start message listener
-        itchat.run()
+        while True:
+            try:
+                itchat.run()
+            except Exception as e:
+                logger.info("会话失效，尝试重新登录。错误信息: {}".format(str(e)))
+                itchat.auto_login(hotReload=True, exitCallback=after_logout, loginCallback=after_login)
 
     # handle_* 系列函数处理收到的消息后构造Context，然后传入produce函数中处理Context和发送回复
     # Context包含了消息的所有信息，包括以下属性

@@ -52,8 +52,8 @@ def qrCallback(uuid, status, qrcode):
 
 
 def script_to_run():
-    # itchat.logout()  # 登出
-    itchat.auto_login(qrCallsback=qrCallback)  # 重新登录
+    itchat.logout()  # 登出
+    itchat.auto_login(enableCmdQR=2,qrCallsback=qrCallback)  # 重新登录
 
 logger.error("开始重启脚本.......");
 # 创建一个非守护线程来执行 script_to_run 函数

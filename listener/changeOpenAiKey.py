@@ -6,7 +6,7 @@ from flask import Blueprint, jsonify, request
 from common.log import logger
 from dto.response import ResultEntity
 from lib import itchat
-
+import restart
 blueprint = Blueprint('config', __name__,url_prefix='')
 
 
@@ -25,7 +25,7 @@ def oparate(oparate):
     logger.info("收到操作通知key",oparate)
     if oparate not in ['stop', 'restart']:
         return jsonify(ResultEntity().to_dict())
-    import restart
+    restart.restartcmd()
     return jsonify(ResultEntity().to_dict())
 
 

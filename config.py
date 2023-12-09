@@ -45,7 +45,8 @@ available_setting = {
     "character_desc": "你是ChatGPT, 一个由OpenAI训练的大型语言模型, 你旨在回答并解决人们的任何问题，并且可以使用多种语言与人交流。",
     # 人格描述
     "conversation_max_tokens": 1000,  # 支持上下文记忆的最多字符数
-
+    "localtion": "",
+    "scrit_name": "",
     # chatgpt限流配置
     "rate_limit_chatgpt": 20,  # chatgpt的调用频率限制
     "rate_limit_dalle": 50,  # openai dalle的调用频率限制

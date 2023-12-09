@@ -7,7 +7,7 @@ import string
 import time
 import traceback
 from typing import Tuple
-
+import restart
 import plugins
 from bridge.bridge import Bridge
 from bridge.context import ContextType
@@ -296,7 +296,7 @@ class Godcmd(Plugin):
                             ok, result = True, "服务已暂停"
                         elif cmd == 'restart':
                             logger.info("重启服务器", time.time())
-                            import restart
+                            restart.restartcmd()
                         elif cmd == "resume":
                             self.isrunning = True
                             ok, result = True, "服务已恢复"

@@ -32,6 +32,7 @@
   "welcome": "",
   "mail_sender": "",
   "mail_password": "",
+  "localtion": "",
   "speech_recognition": false,
   "group_speech_recognition": false,
   "voice_reply_voice": false,

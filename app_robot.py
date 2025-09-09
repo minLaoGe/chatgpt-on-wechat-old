@@ -1,16 +1,17 @@
 # encoding:utf-8
+from flask import Flask
+import threading
+import time
 
 import os
 import signal
 import sys
-import time
-
+from listener import changeOpenAiKey
 from channel import channel_factory
 from common import const
-from config import load_config
+from config import conf, load_config
 from plugins import *
-import threading
-
+import signal
 
 def sigterm_handler_wrap(_signo):
     old_handler = signal.getsignal(_signo)
@@ -57,15 +58,23 @@ def run():
 
         if channel_name == "wxy":
             os.environ["WECHATY_LOG"] = "warn"
-
+            # os.environ['WECHATY_PUPPET_SERVICE_ENDPOINT'] = '127.0.0.1:9001'
         start_channel(channel_name)
-
-        while True:
-            time.sleep(1)
+        channel = channel_factory.create_channel(channel_name)
+        if channel_name in ["wx", "wxy", "terminal", "wechatmp", "wechatmp_service", "wechatcom_app", "wework", const.FEISHU,const.DINGTALK]:
+            PluginManager().load_plugins()
+        new_thread = threading.Thread(target=start_flask)
+        # 启动新线程
+        new_thread.start()
+        # startup channel
+        channel.startup()
     except Exception as e:
         logger.error("App startup failed!")
         logger.exception(e)
-
-
-if __name__ == "__main__":
+def start_flask():
+    app = Flask(__name__)
+    app.register_blueprint(changeOpenAiKey.blueprint)
+    port = conf().get('flask_port', '8082')
+    app.run(host="0.0.0.0", port=port, debug=False)
+if __name__ == '__main__':
     run()

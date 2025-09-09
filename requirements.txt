@@ -5,7 +5,10 @@ qrcode==7.4.2
 requests>=2.28.2
 chardet>=5.1.0
 Pillow
-pre-commit
 web.py
+pre-commit
+flask
+flask-socketio
+orjson
 linkai>=0.0.6.0
 agentmesh-sdk>=0.1.3
